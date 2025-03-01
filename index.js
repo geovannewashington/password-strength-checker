@@ -6,8 +6,12 @@ const passInput = document.getElementById('password-input');
 const msg = document.getElementById('message');
 const strField = document.getElementById('strength');
 
+// we can use this to give the user to check their password, maybe while holding like outlook does
+// passInput.type = 'password';
+
+// TODO: Detect Repeated Patterns
 function calculateStrength() {
-        let strength = 0;
+        let strength = 0; // -> the variable strength needs to be declare inside the function
         
         // 1. Length Test:
         if (passInput.value.length >= 12) {
@@ -29,7 +33,6 @@ function calculateStrength() {
         if (/[^A-Za-z0-9]/.test(passInput.value)) {
                 strength += 2;
         }
-
         return strength;
 } 
 
@@ -56,7 +59,7 @@ function formatDocument(borderColor, textColor) {
 }
 
 function showPass() {
-        if (passInput.value.length > 0) {                
+        if (passInput.value.length) {                
                 msg.style.display = 'block';
         } else {
                 msg.style.display = 'none';
