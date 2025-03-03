@@ -5,7 +5,9 @@
 const passInput = document.getElementById('password-input');
 const msg = document.getElementById('message');
 const strField = document.getElementById('strength');
+const eyeIcon = document.querySelector('#icon-eye');
 
+let isHolding = false;
 // we can use this to give the user to check their password, maybe while holding like outlook does
 // passInput.type = 'password';
 
@@ -53,6 +55,38 @@ function checkPassStr() {
         }
 }
 
+
+function holdAction() {
+        if (isHolding) {
+                passInput.type = 'text';
+                eyeIcon.style.color = '#fff';
+                eyeIcon.classList.replace('fa-eye-slash', 'fa-eye');
+                requestAnimationFrame(holdAction);
+        }
+}
+
+function resetHoldAction() {
+        isHolding = false;
+        eyeIcon.style.color = '#656269';
+        passInput.type = 'password';
+        eyeIcon.classList.replace('fa-eye', 'fa-eye-slash');
+} 
+
+function togglePassView() {
+        eyeIcon.addEventListener('mousedown', () => {
+                isHolding = true;
+                requestAnimationFrame(holdAction);
+        });
+
+        eyeIcon.addEventListener('mouseup', () => {
+                resetHoldAction();
+        });
+        
+        eyeIcon.addEventListener('mouseleave', () => {
+                resetHoldAction();
+        });
+}
+
 function formatDocument(borderColor, textColor) {
         passInput.style.borderColor  = borderColor;
         msg.style.color = textColor;
@@ -72,3 +106,7 @@ passInput.addEventListener('input', () => {
         showPass();
         checkPassStr();
 });
+
+(() => {
+        togglePassView();
+})()
