@@ -1,6 +1,6 @@
 'use strict'
 
-//TODO: Improve password checking logic
+//TODO: implement common-passwords.json using async  
 
 const passInput = document.getElementById('password-input');
 const msg = document.getElementById('message');
@@ -8,9 +8,6 @@ const strField = document.getElementById('strength');
 const eyeIcon = document.querySelector('#icon-eye');
 
 let isHolding = false;
-// we can use this to give the user to check their password, maybe while holding like outlook does
-// passInput.type = 'password';
-
 // TODO: Detect Repeated Patterns
 function calculateStrength() {
         let strength = 0; // -> the variable strength needs to be declare inside the function
@@ -54,7 +51,6 @@ function checkPassStr() {
                 formatDocument('#ff5925', '#ff5925');
         }
 }
-
 
 function holdAction() {
         if (isHolding) {
