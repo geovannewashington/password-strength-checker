@@ -6,8 +6,28 @@ const passInput = document.getElementById('password-input');
 const msg = document.getElementById('message');
 const strField = document.getElementById('strength');
 const eyeIcon = document.querySelector('#icon-eye');
-
 let isHolding = false;
+
+async function fetchJsonFile() {
+        const response = await fetch('./common-passwords.json');
+        if (!response.ok) throw new Error('Error while fetching JSON file');
+        return await response.json(); 
+}
+
+function containsWeakPasswords() {
+        return fetchJsonFile()
+                .then((senhas) => {
+                        let contains = false;
+                        senhas.forEach(element => {
+                                if (element === passInput.value) {
+                                        contains = true;
+                                }  
+                        });
+                        return contains;
+                })
+                .catch(err => console.error(err));
+}
+
 // TODO: Detect Repeated Patterns
 function calculateStrength() {
         let strength = 0; // -> the variable strength needs to be declare inside the function
@@ -32,6 +52,15 @@ function calculateStrength() {
         if (/[^A-Za-z0-9]/.test(passInput.value)) {
                 strength += 2;
         }
+
+        // 3. If it's a commonly used password
+        let isWeak = containsWeakPasswords().then();
+        if (isWeak) {
+                strength -= 10; 
+        }
+
+        // 4. If it contains repeated patterns
+
         return strength;
 } 
 
@@ -97,12 +126,13 @@ function showPass() {
 }
 
 passInput.addEventListener('input', () => {
+        // this constant needs to be create inside here so it value gets recalculated everytime
+        // the is a change on input
         const strength = calculateStrength();
-        console.log(`total strength: ${strength}`);
-        showPass();
-        checkPassStr();
+        // console.log(`total strength: ${strength}`);
+        //checkPassStr();
+        // containsWeakPasswords().then(result => console.log(result));
 });
 
-(() => {
-        togglePassView();
-})()
+showPass();
+togglePassView();
