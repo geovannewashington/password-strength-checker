@@ -4,7 +4,10 @@
 
 const passInput = document.getElementById('password-input');
 const msg = document.getElementById('message');
+
+//this is the field that is going to show the result 
 const strField = document.getElementById('strength');
+
 const eyeIcon = document.querySelector('#icon-eye');
 let isHolding = false;
 
@@ -14,22 +17,25 @@ async function fetchJsonFile() {
         return await response.json(); 
 }
 
-function containsWeakPasswords() {
-        return fetchJsonFile()
-                .then((senhas) => {
-                        let contains = false;
-                        senhas.forEach(element => {
-                                if (element === passInput.value) {
-                                        contains = true;
-                                }  
-                        });
-                        return contains;
-                })
-                .catch(err => console.error(err));
+//function[containsWeakPasswords] retuns a boolean that indicates wheter input is a week password or not
+async function containsWeakPasswords() {
+        try {
+                let contains = false;
+                const senhas = await fetchJsonFile();
+                senhas.forEach(element => {
+                        if (element === passInput.value) {
+                                contains = true;
+                        }  
+                });
+                return contains;
+        } catch (error) {
+                console.error(error); 
+        }
+
 }
 
 // TODO: Detect Repeated Patterns
-function calculateStrength() {
+async function calculateStrength() {
         let strength = 0; // -> the variable strength needs to be declare inside the function
         
         // 1. Length Test:
@@ -54,27 +60,22 @@ function calculateStrength() {
         }
 
         // 3. If it's a commonly used password
-        let isWeak = containsWeakPasswords().then();
-        if (isWeak) {
-                strength -= 10; 
-        }
+        //let isWeak = await containsWeakPasswords();
 
         // 4. If it contains repeated patterns
-
-        return strength;
+        return Promise.resolve(strength);
 } 
 
-function checkPassStr() {
-        if (passInput.value.length >= 8) {
+function handleOutput(strength) {
+        console.log(strength);
+        if (strength = 8) {
                 strField.innerText = 'strong 💪';
                 formatDocument('#26d730', '#26d730');
                 
-        } else if (passInput.value.length >= 4) {
+        } else if (strength >= 5) {
                 strField.innerText  = 'medium 😐';
                 formatDocument('yellow', 'yellow');
                 
-        } else if (passInput.value.length === 0) {
-                formatDocument('#323f3f', null);
         } else {
                 strField.innerText = 'weak 🤒';
                 formatDocument('#ff5925', '#ff5925');
@@ -126,12 +127,10 @@ function showPass() {
 }
 
 passInput.addEventListener('input', () => {
-        // this constant needs to be create inside here so it value gets recalculated everytime
-        // the is a change on input
-        const strength = calculateStrength();
-        // console.log(`total strength: ${strength}`);
-        //checkPassStr();
-        // containsWeakPasswords().then(result => console.log(result));
+        let strength;
+        strength = calculateStrength()
+                .then(result => strength = result);
+        handleOutput(strength);
 });
 
 showPass();
