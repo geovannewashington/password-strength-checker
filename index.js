@@ -31,7 +31,6 @@ async function containsWeakPasswords() {
         } catch (error) {
                 console.error(error); 
         }
-
 }
 
 // TODO: Detect Repeated Patterns
@@ -44,40 +43,39 @@ async function calculateStrength() {
         } else if (passInput.value.length >= 8) {
                 strength += 1;
         }
-        
         // 2. Character Diversity 
-        if (/[A-Z]/g.test(passInput.value)) {
-                strength += 1;
-        }
-        if (/[a-z]/g.test(passInput.value)) {
-                strength += 1;
-        }
-        if (/[0-9]/g.test(passInput.value)) {
-                strength += 1;
-        }
-        if (/[^A-Za-z0-9]/.test(passInput.value)) {
-                strength += 2;
-        }
+        if (/[A-Z]/g.test(passInput.value)) strength += 1;
+        if (/[a-z]/g.test(passInput.value)) strength += 1;
+        if (/[0-9]/g.test(passInput.value)) strength += 1;
+        if (/[^A-Za-z0-9]/.test(passInput.value)) strength += 2;
 
         // 3. If it's a commonly used password
-        //let isWeak = await containsWeakPasswords();
+        // NOTE: in this case I want to show the user that his password was found in the database
+        // of commonly used passwords, and therefore his password is extremelly weak.
+        let isCommon = await containsWeakPasswords();
+        strength = isCommon ? 0 : strength;
 
         // 4. If it contains repeated patterns
-        return Promise.resolve(strength);
+        return { isCommon: isCommon, strength: strength }; 
 } 
 
-function handleOutput(strength) {
-        console.log(strength);
-        if (strength = 8) {
+function handleOutput(resultObj) {
+        console.log(resultObj);
+        if (resultObj.isCommon) {
+                msg.innerText = '[warning]: password found in database, very weak. basdkaldkalsdkkaslçkdlalçksdlçkaklakdls';
+                formatDocument('#ff5925', '#ff5925');
+                return;
+        }
+        if (resultObj.strength == 7) {
                 strField.innerText = 'strong 💪';
                 formatDocument('#26d730', '#26d730');
                 
-        } else if (strength >= 5) {
+        } else if (resultObj.strength >= 5) {
                 strField.innerText  = 'medium 😐';
                 formatDocument('yellow', 'yellow');
                 
         } else {
-                strField.innerText = 'weak 🤒';
+                strField.innerText = 'weak';
                 formatDocument('#ff5925', '#ff5925');
         }
 }
@@ -116,6 +114,7 @@ function togglePassView() {
 function formatDocument(borderColor, textColor) {
         passInput.style.borderColor  = borderColor;
         msg.style.color = textColor;
+        showPass();
 }
 
 function showPass() {
@@ -127,10 +126,10 @@ function showPass() {
 }
 
 passInput.addEventListener('input', () => {
-        let strength;
-        strength = calculateStrength()
-                .then(result => strength = result);
-        handleOutput(strength);
+        calculateStrength()
+                .then(resultObj => {
+                        handleOutput(resultObj);
+                })
 });
 
 showPass();
